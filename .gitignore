@@ -1,105 +1,16 @@
-# ============================================================
-#  SachAI — Urdu Fake News Detection System
-#  .gitignore
-# ============================================================
-
-# ── Environment Variables & Secrets (NEVER commit these) ─────
-.env
-.env.*
-.env.local
-.env.development
-.env.production
-.env.staging
-*.env
-secrets.json
-secrets.yaml
-credentials.json
-config.secret.*
-*.pem
-*.key
-*.p12
-*.pfx
-*.cer
-*.crt
-
-# ── Python ────────────────────────────────────────────────────
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-*.egg
-*.egg-info/
-dist/
-build/
-MANIFEST
-
-# ── Virtual Environments ──────────────────────────────────────
-venv/
-.venv/
-env/
-ENV/
-
-# ── ML Model Weights (large binary — use Git LFS or share separately) ────────
-*.safetensors
-*.bin
-*.pt
-*.pth
-*.ckpt
-*.pkl
-*.pickle
-# keep tokenizer/config text files
-!backend/saved_model/config.json
-!backend/saved_model/tokenizer_config.json
-!backend/saved_model/tokenizer.json
-!backend/saved_model/special_tokens_map.json
-
-# ── Training Artifacts ────────────────────────────────────────
-ml/results/
-runs/
-wandb/
-tensorboard_logs/
-
-# ── Database ──────────────────────────────────────────────────
-*.db
-*.sqlite
-*.sqlite3
-
-# ── Node.js / Next.js ─────────────────────────────────────────
-node_modules/
-.next/
-out/
-.turbo/
-.vercel/
-coverage/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-*.tsbuildinfo
-
-# ── Jupyter ───────────────────────────────────────────────────
-.ipynb_checkpoints/
-
-# ── OS Files ─────────────────────────────────────────────────
-.DS_Store
-Thumbs.db
-Desktop.ini
-
-# ── IDE / Editor ─────────────────────────────────────────────
-.idea/
-*.swp
-*.swo
-*~
-.cursor/
-
-# ── Logs & Temp ──────────────────────────────────────────────
-*.log
-*.tmp
-*.temp
-*.bak
-tmp/
-temp/
-
-# ── HuggingFace cache ─────────────────────────────────────────
-.cache/
-huggingface_cache/
+.claude
+.code-review-graph
+.cursor
+.cursorrules
+.mcp.json
+.opencode.json
+.windsurfrules
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.agents 
+.codex
+.vscode
+.kiro
+.venv
+.vscode

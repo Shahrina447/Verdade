@@ -11,10 +11,6 @@ class PredictResponse(BaseModel):
     confidence: float
     confidence_real: float
     confidence_fake: float
-    linguistic_score: float
-    source_score: float
-    sentiment_score: float
-    fact_score: float
     verdict_text: str
     prediction_id: str
     timestamp: str

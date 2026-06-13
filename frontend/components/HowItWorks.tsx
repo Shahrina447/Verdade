@@ -15,8 +15,8 @@ const STEPS = [
   },
   {
     icon: BarChart3,
-    title: 'Score Breakdown',
-    desc: 'Four scores are calculated: Linguistic Authenticity, Source Credibility, Sentiment & Bias, Fact Cross-Reference.',
+    title: 'Probability Scores',
+    desc: 'Model returns real vs fake confidence probabilities from the fine-tuned xlm-RoBERTa classifier.',
     step: '03',
   },
   {

@@ -1,96 +1,10 @@
-'use client'
-
-import { useEffect, useRef, useState } from 'react'
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-} from 'chart.js'
-import { Line } from 'react-chartjs-2'
-import { TrendingUp, Database, Award, Globe } from 'lucide-react'
-
-// Register Chart.js components — must be done before any <Line /> usage
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-)
-
-const chartData = {
-  labels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
-  datasets: [
-    {
-      label: 'Real News Verified',
-      data: [3200, 4100, 4800, 5300, 6700, 7400],
-      borderColor: '#a78bfa',
-      backgroundColor: 'rgba(167,139,250,0.08)',
-      fill: true,
-      tension: 0.4,
-      borderWidth: 2,
-      pointBackgroundColor: '#a78bfa',
-      pointRadius: 4,
-    },
-    {
-      label: 'Fake News Detected',
-      data: [1800, 2200, 2700, 3100, 3900, 4500],
-      borderColor: '#f87171',
-      backgroundColor: 'rgba(248,113,113,0.08)',
-      fill: true,
-      tension: 0.4,
-      borderWidth: 2,
-      pointBackgroundColor: '#f87171',
-      pointRadius: 4,
-    },
-  ],
-}
-
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      labels: {
-        color: '#cbd5e1',
-        font: { size: 11 },
-        boxWidth: 12,
-      },
-    },
-    tooltip: {
-      backgroundColor: 'rgba(15,21,48,0.95)',
-      borderColor: 'rgba(255,255,255,0.08)',
-      borderWidth: 1,
-      titleColor: '#e2e8f0',
-      bodyColor: '#94a3b8',
-    },
-  },
-  scales: {
-    x: {
-      ticks: { color: '#94a3b8', font: { size: 11 } },
-      grid: { color: 'rgba(255,255,255,0.05)' },
-    },
-    y: {
-      ticks: { color: '#94a3b8', font: { size: 11 } },
-      grid: { color: 'rgba(255,255,255,0.05)' },
-    },
-  },
-}
+import { Brain, Cpu, Languages, ShieldCheck } from 'lucide-react'
 
 const STAT_CARDS = [
-  { icon: Award, label: 'Model Accuracy', value: '91.2%', color: '#a78bfa' },
-  { icon: Database, label: 'Training Samples', value: '10,083', color: '#22d3ee' },
-  { icon: TrendingUp, label: 'F1 Score', value: '0.908', color: '#34d399' },
-  { icon: Globe, label: 'Domains Covered', value: '15', color: '#fbbf24' },
+  { icon: Brain,       label: 'Model',          value: 'xlm-RoBERTa', color: '#a78bfa' },
+  { icon: Languages,   label: 'Language',        value: 'Urdu',        color: '#22d3ee' },
+  { icon: Cpu,         label: 'Inference',       value: 'CPU-Only',    color: '#34d399' },
+  { icon: ShieldCheck, label: 'Classification',  value: 'REAL / FAKE', color: '#fbbf24' },
 ]
 
 export default function StatsSection() {
@@ -100,14 +14,14 @@ export default function StatsSection() {
         {/* Header */}
         <div className="text-center mb-14">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Model <span className="gradient-text">Performance</span>
+            Model <span className="gradient-text">Overview</span>
           </h2>
           <p className="text-slate-400 max-w-lg mx-auto">
-            Fine-tuned on Ax-to-Grind Urdu dataset — expert-annotated across 15 domains
+            Fine-tuned xlm-RoBERTa for Urdu fake news binary classification
           </p>
         </div>
 
-        {/* Stat pills */}
+        {/* Stat cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
           {STAT_CARDS.map((s, i) => (
             <div key={i} className="glass rounded-2xl p-5 text-center feature-card">
@@ -117,20 +31,28 @@ export default function StatsSection() {
               >
                 <s.icon className="w-5 h-5" style={{ color: s.color }} />
               </div>
-              <div className="text-2xl font-extrabold text-white mb-1">{s.value}</div>
+              <div className="text-xl font-extrabold text-white mb-1">{s.value}</div>
               <div className="text-xs text-slate-500">{s.label}</div>
             </div>
           ))}
         </div>
 
-        {/* Line chart */}
-        <div className="glass rounded-2xl p-6">
-          <h3 className="text-sm font-semibold text-slate-400 mb-6">
-            Detection Trends (Simulated)
-          </h3>
-          <div style={{ height: '260px' }}>
-            <Line data={chartData} options={chartOptions} />
-          </div>
+        {/* Architecture tags */}
+        <div className="glass rounded-xl p-5 flex flex-wrap gap-3 items-center justify-center text-xs text-slate-500">
+          {[
+            'xlm-roberta-base',
+            '768-dim embeddings',
+            '12 attention layers',
+            'Max 128 tokens',
+            'Float32 precision',
+            'HuggingFace Transformers',
+            'FastAPI backend',
+            'aiosqlite storage',
+          ].map((tag) => (
+            <span key={tag} className="px-3 py-1 rounded-full border border-white/10 text-slate-400">
+              {tag}
+            </span>
+          ))}
         </div>
       </div>
     </section>

@@ -24,7 +24,7 @@ export default function HeroSection() {
       {/* Trust badge */}
       <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-xs text-slate-300 mb-8 border border-purple-500/20">
         <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-        <span>xlm-RoBERTa · 10,083 Urdu Samples · CPU-Powered</span>
+        <span>xlm-RoBERTa · Fine-tuned · CPU-Powered</span>
       </div>
 
       {/* Main heading */}
@@ -64,10 +64,10 @@ export default function HeroSection() {
       {/* Stat pills */}
       <div className="flex flex-wrap gap-4 justify-center mt-14">
         {[
-          { label: 'Accuracy', value: '91.2%' },
-          { label: 'F1 Score', value: '0.908' },
-          { label: 'Dataset', value: '10K+' },
-          { label: 'Languages', value: 'Urdu' },
+          { label: 'Model', value: 'xlm-RoBERTa' },
+          { label: 'Task', value: 'Classification' },
+          { label: 'Device', value: 'CPU' },
+          { label: 'Language', value: 'Urdu' },
         ].map((s) => (
           <div key={s.label} className="glass px-5 py-3 rounded-xl text-center">
             <div className="text-lg font-bold gradient-text">{s.value}</div>

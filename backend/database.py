@@ -16,10 +16,8 @@ async def init_db():
                 text_preview TEXT,
                 prediction TEXT,
                 confidence REAL,
-                linguistic_score REAL,
-                source_score REAL,
-                sentiment_score REAL,
-                fact_score REAL,
+                confidence_real REAL,
+                confidence_fake REAL,
                 full_text TEXT,
                 timestamp TEXT
             )
@@ -32,17 +30,15 @@ async def save_prediction(data: dict):
         await db.execute(
             """
             INSERT OR REPLACE INTO predictions
-            VALUES (?,?,?,?,?,?,?,?,?,?)
+            VALUES (?,?,?,?,?,?,?,?)
             """,
             (
                 data["prediction_id"],
                 data["text_preview"],
                 data["prediction"],
                 data["confidence"],
-                data["linguistic_score"],
-                data["source_score"],
-                data["sentiment_score"],
-                data["fact_score"],
+                data["confidence_real"],
+                data["confidence_fake"],
                 data["full_text"],
                 data["timestamp"],
             ),

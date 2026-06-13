@@ -11,7 +11,7 @@ const FEATURES = [
   {
     icon: Brain,
     title: 'xlm-RoBERTa Model',
-    desc: 'State-of-the-art multilingual transformer fine-tuned on 10K+ expert-annotated Urdu news samples.',
+    desc: 'State-of-the-art multilingual transformer fine-tuned on Urdu news data for binary fake news classification.',
     color: '#a78bfa',
   },
   {
@@ -22,20 +22,20 @@ const FEATURES = [
   },
   {
     icon: ShieldCheck,
-    title: '4-Dimension Scoring',
-    desc: 'Linguistic Authenticity, Source Credibility, Sentiment & Bias, and Fact Cross-Reference scores.',
+    title: 'Instant Verdict',
+    desc: 'Returns REAL or FAKE classification with confidence probability from the trained model.',
     color: '#34d399',
   },
   {
     icon: BarChart2,
     title: 'Confidence Meter',
-    desc: 'Visual conic-gradient circular meter with REAL / MIXED / FAKE classification and probability breakdown.',
+    desc: 'Visual circular meter showing real vs fake probability with clear REAL / FAKE verdict.',
     color: '#fbbf24',
   },
   {
     icon: Clock,
     title: 'Prediction History',
-    desc: 'All analyses are persisted in SQLite. Browse, filter, and delete your past predictions anytime.',
+    desc: 'All analyses are persisted in SQLite. Browse and delete your past predictions anytime.',
     color: '#f87171',
   },
   {

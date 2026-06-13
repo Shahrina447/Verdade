@@ -1,18 +1,16 @@
 const ITEMS = [
   '✓ Urdu Fake News Detection',
   '✦ xlm-RoBERTa Fine-Tuned',
-  '✓ 10,083 Expert-Annotated Samples',
-  '✦ 15 News Domains',
+  '✓ Binary Classification',
+  '✦ REAL / FAKE Verdict',
   '✓ CPU-Only Inference',
-  '✦ 91.2% Accuracy',
-  '✓ F1: 0.908',
   '✦ Real-Time Analysis',
   '✓ Prediction History',
   '✦ سچ کی پہچان',
-  '✓ Linguistic Authenticity Score',
-  '✦ Source Credibility Score',
-  '✓ Sentiment & Bias Detection',
-  '✦ Fact Cross-Reference',
+  '✓ Urdu Text Preprocessing',
+  '✦ Confidence Score',
+  '✓ FastAPI Backend',
+  '✦ Next.js Frontend',
 ]
 
 // Duplicate for seamless loop

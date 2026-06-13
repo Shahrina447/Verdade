@@ -1,6 +1,5 @@
 import os
 import torch
-import random
 import uuid
 from datetime import datetime
 from dotenv import load_dotenv
@@ -52,10 +51,6 @@ def predict(text: str) -> dict:
     real_conf = round(probs[0].item(), 3)
     fake_conf = round(probs[1].item(), 3)
     prediction = "REAL" if real_conf > fake_conf else "FAKE"
-    base = real_conf if prediction == "REAL" else fake_conf
-
-    def _noise():
-        return round(random.uniform(-0.05, 0.05), 3)
 
     if real_conf > 0.75:
         verdict = "✓ Authentic linguistic patterns detected. Content appears credible."
@@ -72,10 +67,6 @@ def predict(text: str) -> dict:
         "confidence": max(real_conf, fake_conf),
         "confidence_real": real_conf,
         "confidence_fake": fake_conf,
-        "linguistic_score": round(max(0.1, min(0.98, base + _noise())), 3),
-        "source_score":     round(max(0.1, min(0.98, base + _noise())), 3),
-        "sentiment_score":  round(max(0.1, min(0.98, base + _noise())), 3),
-        "fact_score":       round(max(0.1, min(0.98, base + _noise())), 3),
         "verdict_text": verdict,
         "prediction_id": str(uuid.uuid4()),
         "timestamp": datetime.utcnow().isoformat(),

@@ -231,30 +231,22 @@ export default function DetectorSection() {
                 </div>
               </div>
 
-              {/* 4 breakdown scores */}
+              {/* 4 breakdown scores — removed: these were not real model outputs */}
+
+              {/* Confidence breakdown */}
               <div className="glass rounded-xl p-5 space-y-4">
                 <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
-                  Breakdown Analysis
+                  Confidence Breakdown
                 </h4>
                 <ProgressBar
-                  label="Linguistic Authenticity"
-                  value={result.linguistic_score}
-                  color="#a78bfa"
-                />
-                <ProgressBar
-                  label="Source Credibility"
-                  value={result.source_score}
-                  color="#22d3ee"
-                />
-                <ProgressBar
-                  label="Sentiment & Bias"
-                  value={result.sentiment_score}
+                  label="Real News Probability"
+                  value={result.confidence_real}
                   color="#34d399"
                 />
                 <ProgressBar
-                  label="Fact Cross-Reference"
-                  value={result.fact_score}
-                  color="#fbbf24"
+                  label="Fake News Probability"
+                  value={result.confidence_fake}
+                  color="#f87171"
                 />
               </div>
 
