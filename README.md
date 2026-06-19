@@ -426,29 +426,3 @@ For training speed, use Google Colab's free T4 GPU tier with `fp16=True`.
 
 ---
 
-## References
-
-1. D. Harris et al., "Ax-to-Grind Urdu: Benchmark Dataset for Urdu Fake News Detection," *arXiv preprint arXiv:2403.14037*, Mar. 2024. [Online]. Available: https://arxiv.org/abs/2403.14037
-
-2. M. Amjad et al., "Verifying Urdu news authenticity using deep learning with concatenated BERT and GloVe embedding," *Scientific Reports*, vol. 16, no. 1, 2026, doi: 10.1038/s41598-026-36771-0.
-
-3. A. Khan et al., "Fake News Classification in Urdu: A Domain Adaptation Approach," *arXiv preprint arXiv:2512.22778*, Dec. 2025. [Online]. Available: https://arxiv.org/abs/2512.22778
-
----
-
-
----
-
-<div align="center">
-
-SachAI is an academic semester project for informational purposes only.
-It is not a substitute for professional fact-checking or editorial review.
-Always verify critical information through trusted journalistic sources.
-
----
-
-Built with Next.js · FastAPI · HuggingFace Transformers · PyTorch CPU
-
-**SachAI** · سچ کی پہچان
-
-</div>

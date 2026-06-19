@@ -11,6 +11,15 @@ DEVICE = torch.device("cpu")
 
 MODEL_PATH = os.getenv("MODEL_PATH", "./saved_model")
 
+# ─── Decision threshold ───────────────────────────────────────────────────────
+# REAL is predicted only when real_conf >= REAL_THRESHOLD.
+# Default 0.5 = standard. Lower it (e.g. 0.4) to catch more fake news
+# at the cost of some false positives on real news.
+# Set via env: REAL_THRESHOLD=0.4
+REAL_THRESHOLD = float(os.getenv("REAL_THRESHOLD", "0.5"))
+
+TEMPERATURE = float(os.getenv("TEMPERATURE", "3.0"))
+
 # Global model / tokenizer — loaded once at startup
 _model = None
 _tokenizer = None
@@ -29,6 +38,7 @@ def load_model():
     _model.to(DEVICE)
     _model.eval()
     print(f"[SachAI] Model loaded from '{MODEL_PATH}' on {DEVICE}")
+    print(f"[SachAI] REAL threshold = {REAL_THRESHOLD} | Temperature = {TEMPERATURE}")
 
 
 def predict(text: str) -> dict:
@@ -47,14 +57,20 @@ def predict(text: str) -> dict:
     with torch.no_grad():
         outputs = _model(**inputs)
 
-    probs = torch.nn.functional.softmax(outputs.logits, dim=-1)[0]
-    real_conf = round(probs[0].item(), 3)
-    fake_conf = round(probs[1].item(), 3)
-    prediction = "REAL" if real_conf > fake_conf else "FAKE"
+    probs = torch.nn.functional.softmax(outputs.logits / TEMPERATURE, dim=-1)[0]
+    # LABEL_0 = FAKE, LABEL_1 = REAL (as encoded during training)
+    fake_conf = round(probs[0].item(), 3)
+    real_conf = round(probs[1].item(), 3)
 
-    if real_conf > 0.75:
+    # Apply configurable threshold — model must be >= REAL_THRESHOLD confident
+    # in REAL before we label it as such, otherwise it's FAKE.
+    prediction = "REAL" if real_conf >= REAL_THRESHOLD else "FAKE"
+
+    if real_conf >= REAL_THRESHOLD and real_conf >= 0.75:
         verdict = "✓ Authentic linguistic patterns detected. Content appears credible."
-    elif real_conf > 0.45:
+    elif real_conf >= REAL_THRESHOLD and real_conf >= 0.55:
+        verdict = "⚠ Possibly credible but verify with trusted sources before sharing."
+    elif real_conf >= REAL_THRESHOLD:
         verdict = "⚠ Mixed signals detected. Verify with trusted sources."
     else:
         verdict = (

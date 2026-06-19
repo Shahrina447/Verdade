@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from schemas import PredictRequest, PredictResponse, HistoryItem
+from schemas import PredictRequest, PredictResponse, HistoryItem, BatchRequest, BatchResponse, BatchSummary
 from model import load_model, predict
 from database import init_db, save_prediction, get_history, delete_prediction, clear_all_predictions
 from preprocess import clean_urdu_text
@@ -52,6 +52,37 @@ async def predict_endpoint(req: PredictRequest):
     result = predict(clean_urdu_text(req.text))
     await save_prediction({**result, "full_text": req.text, "text_preview": req.text[:50]})
     return result
+
+
+@app.post("/api/predict/batch", response_model=BatchResponse)
+async def predict_batch_endpoint(req: BatchRequest):
+    if len(req.texts) == 0:
+        raise HTTPException(status_code=400, detail="texts list cannot be empty")
+    if len(req.texts) > 10:
+        raise HTTPException(status_code=400, detail="Maximum 10 texts per batch")
+
+    results = []
+    for text in req.texts:
+        text = text.strip()
+        if len(text) < 10:
+            raise HTTPException(status_code=400, detail=f"Text too short (min 10 characters): '{text[:30]}…'")
+        if len(text) > 1000:
+            raise HTTPException(status_code=400, detail=f"Text too long (max 1000 characters)")
+        result = predict(clean_urdu_text(text))
+        await save_prediction({**result, "full_text": text, "text_preview": text[:50]})
+        results.append(result)
+
+    fake_count = sum(1 for r in results if r["prediction"] == "FAKE")
+    real_count = len(results) - fake_count
+    fake_pct = round((fake_count / len(results)) * 100, 1) if results else 0.0
+
+    summary = BatchSummary(
+        total=len(results),
+        fake=fake_count,
+        real=real_count,
+        fake_percentage=fake_pct,
+    )
+    return BatchResponse(results=results, summary=summary)
 
 
 @app.get("/api/history")

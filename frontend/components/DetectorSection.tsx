@@ -23,7 +23,6 @@ function verdictIcon(prediction: string) {
   if (prediction === 'FAKE') return <AlertTriangle className="w-5 h-5 text-red-400" />
   return <HelpCircle className="w-5 h-5 text-amber-400" />
 }
-
 function ProgressBar({ label, value, color }: { label: string; value: number; color: string }) {
   const [width, setWidth] = useState(0)
   useEffect(() => {
@@ -59,8 +58,6 @@ export default function DetectorSection() {
       const color =
         result.prediction === 'REAL'
           ? '#10b981'
-          : result.prediction === 'MIXED'
-          ? '#f59e0b'
           : '#ef4444'
       // Small delay so CSS transition fires
       setTimeout(() => {
@@ -212,9 +209,7 @@ export default function DetectorSection() {
                       className={`text-2xl font-extrabold ${
                         result.prediction === 'REAL'
                           ? 'text-emerald-400'
-                          : result.prediction === 'FAKE'
-                          ? 'text-red-400'
-                          : 'text-amber-400'
+                          : 'text-red-400'
                       }`}
                     >
                       {result.prediction}

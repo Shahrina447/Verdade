@@ -22,3 +22,19 @@ class HistoryItem(BaseModel):
     prediction: str
     confidence: float
     timestamp: str
+
+
+class BatchRequest(BaseModel):
+    texts: list[str] = Field(..., min_length=1, max_length=10)
+
+
+class BatchSummary(BaseModel):
+    total: int
+    fake: int
+    real: int
+    fake_percentage: float
+
+
+class BatchResponse(BaseModel):
+    results: list[PredictResponse]
+    summary: BatchSummary

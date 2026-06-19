@@ -20,8 +20,25 @@ export interface HistoryItem {
   timestamp: string
 }
 
+export interface BatchSummary {
+  total: number
+  fake: number
+  real: number
+  fake_percentage: number
+}
+
+export interface BatchResponse {
+  results: PredictResponse[]
+  summary: BatchSummary
+}
+
 export async function analyzeNews(text: string): Promise<PredictResponse> {
   const { data } = await axios.post<PredictResponse>(`${BASE}/api/predict`, { text })
+  return data
+}
+
+export async function analyzeNewsBatch(texts: string[]): Promise<BatchResponse> {
+  const { data } = await axios.post<BatchResponse>(`${BASE}/api/predict/batch`, { texts })
   return data
 }
 

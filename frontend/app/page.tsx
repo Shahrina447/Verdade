@@ -3,6 +3,7 @@
 import Navbar from '@/components/Navbar'
 import HeroSection from '@/components/HeroSection'
 import DetectorSection from '@/components/DetectorSection'
+import BatchAnalyzer from '@/components/BatchAnalyzer'
 import HowItWorks from '@/components/HowItWorks'
 import StatsSection from '@/components/StatsSection'
 import FeaturesSection from '@/components/FeaturesSection'
@@ -30,6 +31,7 @@ export default function Home() {
       <Navbar />
       <HeroSection />
       <DetectorSection />
+      <BatchAnalyzer />
       <HowItWorks />
       <StatsSection />
       <FeaturesSection />
