@@ -1,3 +1,10 @@
 __pycache__
-.env 
+.env
+.venv/
+venv/
+saved_model/
+*.safetensors
+*.pt
+*.bin
+predictions.db
 venv
