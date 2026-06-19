@@ -16,9 +16,9 @@ MODEL_PATH = os.getenv("MODEL_PATH", "./saved_model")
 # Default 0.5 = standard. Lower it (e.g. 0.4) to catch more fake news
 # at the cost of some false positives on real news.
 # Set via env: REAL_THRESHOLD=0.4
-REAL_THRESHOLD = float(os.getenv("REAL_THRESHOLD", "0.5"))
+REAL_THRESHOLD = float(os.getenv("REAL_THRESHOLD", "0.55"))
 
-TEMPERATURE = float(os.getenv("TEMPERATURE", "3.0"))
+TEMPERATURE = float(os.getenv("TEMPERATURE", "1.5"))
 
 # Global model / tokenizer — loaded once at startup
 _model = None
@@ -66,17 +66,16 @@ def predict(text: str) -> dict:
     # in REAL before we label it as such, otherwise it's FAKE.
     prediction = "REAL" if real_conf >= REAL_THRESHOLD else "FAKE"
 
-    if real_conf >= REAL_THRESHOLD and real_conf >= 0.75:
+    if prediction == "REAL" and real_conf >= 0.80:
         verdict = "✓ Authentic linguistic patterns detected. Content appears credible."
-    elif real_conf >= REAL_THRESHOLD and real_conf >= 0.55:
-        verdict = "⚠ Possibly credible but verify with trusted sources before sharing."
-    elif real_conf >= REAL_THRESHOLD:
-        verdict = "⚠ Mixed signals detected. Verify with trusted sources."
+    elif prediction == "REAL" and real_conf >= 0.65:
+        verdict = "⚠ Likely credible but verify with trusted sources before sharing."
+    elif prediction == "REAL":
+        verdict = "⚠ Mixed signals detected. Treat with caution and verify independently."
+    elif fake_conf >= 0.80:
+        verdict = "✗ Strong misinformation indicators: sensational tone, unverifiable claims, suspicious phrasing."
     else:
-        verdict = (
-            "✗ Misinformation indicators detected: "
-            "sensational tone and unverifiable claims."
-        )
+        verdict = "✗ Misinformation indicators detected: sensational tone and unverifiable claims."
 
     return {
         "prediction": prediction,
