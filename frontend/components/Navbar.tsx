@@ -2,10 +2,18 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { Brain, Menu, X } from 'lucide-react'
+import { Brain, Menu, X, User } from 'lucide-react'
+
+// Profile info — update these to match your details
+const PROFILE = {
+  name: 'Shahrina447',
+  role: 'Developer',
+  avatar: null as string | null, // set to an image URL if you have one
+}
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
@@ -27,12 +35,81 @@ export default function Navbar() {
             <Link href="/history" className="hover:text-white transition-colors">History</Link>
           </div>
 
-          {/* Status badge + mobile toggle */}
-          <div className="flex items-center gap-4">
+          {/* Right side: Status badge + Profile + mobile toggle */}
+          <div className="flex items-center gap-3">
+            {/* Live badge */}
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs text-slate-300">
               <span className="pulse-dot" />
               <span>Live</span>
             </div>
+
+            {/* Profile button */}
+            <div className="relative">
+              <button
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="flex items-center gap-2 px-2 py-1.5 rounded-xl glass border border-white/10 hover:border-purple-500/40 transition-colors"
+                aria-label="Profile"
+              >
+                {PROFILE.avatar ? (
+                  <img
+                    src={PROFILE.avatar}
+                    alt={PROFILE.name}
+                    className="w-7 h-7 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-7 h-7 rounded-full btn-primary flex items-center justify-center">
+                    <User className="w-3.5 h-3.5 text-white" />
+                  </div>
+                )}
+                <span className="hidden sm:block text-xs text-slate-300 font-medium">
+                  {PROFILE.name}
+                </span>
+              </button>
+
+              {/* Profile dropdown */}
+              {profileOpen && (
+                <>
+                  {/* Backdrop to close on outside click */}
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setProfileOpen(false)}
+                  />
+                  <div className="absolute right-0 mt-2 w-52 glass rounded-xl border border-white/10 shadow-xl z-20 overflow-hidden">
+                    {/* Profile info */}
+                    <div className="px-4 py-3 border-b border-white/5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full btn-primary flex items-center justify-center shrink-0">
+                          <User className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-white">{PROFILE.name}</p>
+                          <p className="text-xs text-slate-500">{PROFILE.role}</p>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Dropdown actions */}
+                    <div className="py-1">
+                      <Link
+                        href="/history"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+                      >
+                        My History
+                      </Link>
+                      <Link
+                        href="/#detector"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
+                      >
+                        New Analysis
+                      </Link>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Mobile menu toggle */}
             <button
               className="md:hidden p-2 rounded-lg glass"
               onClick={() => setOpen(!open)}
