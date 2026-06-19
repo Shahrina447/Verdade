@@ -36,10 +36,12 @@ saved_model/
 *.db
 *.sqlite3
 
-# Environment variables
+# Environment variables (keep .env.example files)
 .env
 .env.local
-.env.*
+.env.development
+.env.production
+.env.test
 
 # OS
 .DS_Store

@@ -1,7 +1,5 @@
 .env.local
 .env
-.env.example
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
 /node_modules
@@ -33,8 +31,12 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files (keep .env.example for reference)
+.env
+.env.local
+.env.development
+.env.production
+.env.test
 
 # vercel
 .vercel
