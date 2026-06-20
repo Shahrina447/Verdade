@@ -209,7 +209,11 @@ The trained model weights (`model.safetensors`) are not stored in this repositor
 
 
 
-The model was evaluated on a balanced held-out test set of 1000 samples (500 FAKE + 500 TRUE) from the combined dataset:
+The model was evaluated on three different test sets:
+
+---
+
+**Test 1 — Combined dataset held-out test (1000 balanced samples)**
 
 | Metric | Value |
 |---|---|
@@ -218,14 +222,48 @@ The model was evaluated on a balanced held-out test set of 1000 samples (500 FAK
 | Recall | 0.9080 |
 | F1 Score | 0.9419 |
 
-**Confusion Matrix (FAKE = positive class):**
+Confusion Matrix:
 
 | | Predicted FAKE | Predicted TRUE |
 |---|---|---|
 | Actual FAKE | 454 (TP) | 46 (FN) |
 | Actual TRUE | 10 (FP) | 490 (TN) |
 
-The model correctly identifies 90.8% of fake news with very few false alarms on real news (precision 97.8%). The model was retrained on a combined dataset of Ax-to-Grind Urdu and Hook & Bait Urdu to improve cross-domain generalization, improving accuracy from 74.5% (single dataset) to 94.4%.
+---
+
+**Test 2 — Synthetic Urdu news (50 hand-crafted samples, 25 FAKE + 25 TRUE)**
+
+Manually written Urdu news articles to test generalization on completely unseen data outside the training distribution.
+
+| Metric | Value |
+|---|---|
+| Accuracy | **84.00%** |
+| Precision | 1.0000 |
+| Recall | 0.6800 |
+| F1 Score | 0.8095 |
+
+Confusion Matrix:
+
+| | Predicted FAKE | Predicted TRUE |
+|---|---|---|
+| Actual FAKE | 17 (TP) | 8 (FN) |
+| Actual TRUE | 0 (FP) | 25 (TN) |
+
+Key observations:
+- **Precision = 1.0** — every FAKE prediction was correct, zero false alarms on real news
+- **8 missed fake news** — all were written in neutral, realistic journalistic tone (e.g. "China gifted 50,000 cars to Pakistan", "UK removed visa fee") making them hard to distinguish from plausible real news
+- This is a known challenge in fake news detection — subtly-written misinformation is harder to catch than sensational claims
+
+---
+
+**Summary across all test sets:**
+
+| Test Set | Samples | Accuracy | F1 |
+|---|---|---|---|
+| Combined dataset (in-distribution) | 1000 | 94.4% | 0.942 |
+| Synthetic data (out-of-distribution) | 50 | 84.0% | 0.810 |
+
+The model was retrained on a combined dataset of Ax-to-Grind Urdu and Hook & Bait Urdu, improving cross-domain accuracy from 74.5% (single dataset) to 94.4%.
 
 ---
 
