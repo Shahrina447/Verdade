@@ -26,7 +26,7 @@
 
 SachAI is a full-stack NLP web application that detects misinformation in Urdu news articles using a fine-tuned **xlm-RoBERTa** transformer model. A user pastes any Urdu text and receives an instant verdict — **REAL** or **FAKE** — with a confidence percentage and a human-readable explanation.
 
-The model is fine-tuned on a combined corpus of **Ax-to-Grind Urdu** and **Hook & Bait Urdu** — two expert-annotated Pakistani news datasets. The backend runs entirely on CPU using PyTorch float32, no GPU required.
+The model is fine-tuned on a **combined corpus** of Ax-to-Grind Urdu (~10K samples) and Hook & Bait Urdu (~34K balanced samples), totalling ~44K training examples across two datasets. The backend runs entirely on CPU using PyTorch float32, no GPU required.
 
 ---
 
@@ -335,13 +335,26 @@ Base URL: `http://localhost:8000`
 
 ## Dataset
 
-| Dataset | Samples | Labels | Role | Source |
-|---|---|---|---|---|
-| Ax-to-Grind Urdu | 10,083 | FAKE / TRUE | Primary training | [arXiv:2403.14037](https://arxiv.org/abs/2403.14037) |
-| Hook & Bait Urdu | ~59,000 | FAKE / TRUE | Combined training | Internal corpus |
-| Synthetic test | 50 | FAKE / TRUE | Out-of-distribution eval | Hand-crafted |
+### Training Data
 
-> Dataset files are not included in this repository. Download from the sources above.
+The model was trained on a **combined dataset** of two Urdu fake news corpora:
+
+| Dataset | Samples | FAKE | TRUE | Source |
+|---|---|---|---|---|
+| Ax-to-Grind Urdu | 10,083 | 5,053 | 5,030 | [arXiv:2403.14037](https://arxiv.org/abs/2403.14037) |
+| Hook & Bait Urdu | ~34,412 (balanced) | 17,206 | 17,206 | Internal corpus |
+| **Combined Total** | **~44,495** | **~22,259** | **~22,236** | — |
+
+Hook & Bait was class-balanced by downsampling the TRUE class (42,179 → 17,206) to match FAKE count before combining. The final combined dataset was shuffled with a fixed random seed (42) before training.
+
+### Evaluation Data
+
+| Dataset | Samples | Type | Role |
+|---|---|---|---|
+| Combined held-out test | 1,000 | Balanced (500 FAKE + 500 TRUE) | In-distribution evaluation |
+| Synthetic Urdu news | 50 | Hand-crafted (25 FAKE + 25 TRUE) | Out-of-distribution evaluation |
+
+> Dataset files are not included in this repository. Download Ax-to-Grind from the source above.
 
 ---
 
