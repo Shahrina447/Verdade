@@ -46,3 +46,7 @@ saved_model/
 # OS
 .DS_Store
 Thumbs.db
+.gemini 
+.github
+.qoder
+QODER.md
