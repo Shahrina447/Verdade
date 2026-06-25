@@ -41,16 +41,17 @@ export default function HowItWorks() {
 
         {/* Step cards with connector */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
-          {/* Connector line (desktop only) */}
-          <div className="absolute top-14 left-[12%] right-[12%] h-px bg-gradient-to-r from-purple-200 via-cyan-200 via-amber-200 to-emerald-200 hidden lg:block" />
+          {/* Connector line — behind cards, desktop only */}
+          <div className="absolute top-14 left-[12%] right-[12%] h-px bg-gradient-to-r from-purple-200 via-cyan-200 to-emerald-200 hidden lg:block pointer-events-none -z-10" />
 
           {STEPS.map((s, i) => (
             <div
               key={i}
               className={`feature-card bg-gradient-to-b ${s.bg} border ${s.border} rounded-3xl p-6 relative overflow-hidden shadow-sm`}
             >
+              {/* Watermark number — clipped inside card via overflow-hidden */}
               <span
-                className="absolute top-3 right-4 text-7xl font-black select-none"
+                className="absolute -top-2 right-3 text-7xl font-black select-none leading-none"
                 style={{ color: `${s.color}08` }}
               >
                 {s.step}

@@ -39,6 +39,9 @@ saved_model/
 # Dataset and result CSV files
 *.csv
 
+# Example env files (contain config hints — keep locally, not on GitHub)
+.env.example
+
 # Environment variables (keep .env.example files)
 .env
 .env.local
