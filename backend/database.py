@@ -25,6 +25,7 @@ async def init_db():
         await db.commit()
 
 
+
 async def save_prediction(data: dict):
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(

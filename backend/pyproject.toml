@@ -1,7 +1,7 @@
 [project]
-name = "sachai-backend"
+name = "verdade-backend"
 version = "0.1.0"
-description = "SachAI — Urdu Fake News Detection API"
+description = "Verdade — Urdu Fake News Detection API"
 requires-python = ">=3.10,<3.13"
 dependencies = [
     "aiosqlite==0.20.0",

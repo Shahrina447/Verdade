@@ -120,7 +120,7 @@ def evaluate(file_path: str, text_col: str, label_col: str, sample: int = None, 
             continue
 
         pred_label, real_conf, fake_conf = predict_text(text, tokenizer, model)
-        correct = "✓" if pred_label == true_label else "✗"
+        correct = "OK" if pred_label == true_label else "XX"
 
         print(f"{i:<5} {true_label:<6} {pred_label:<6} {real_conf:<8.3f} {fake_conf:<8.3f} {correct} {text[:40]}")
 
@@ -180,7 +180,7 @@ def evaluate(file_path: str, text_col: str, label_col: str, sample: int = None, 
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Evaluate SachAI model on a test CSV")
+    parser = argparse.ArgumentParser(description="Evaluate Verdade model on a test CSV")
     parser.add_argument("--file",      required=True,   help="Path to test CSV file")
     parser.add_argument("--text-col",  default="text",   help="Column name for text (default: text)")
     parser.add_argument("--label-col", default="label",  help="Column name for label (default: label)")
