@@ -1,33 +1,32 @@
-import os
+"""
+Verdade — Urdu Fake-News Detection API
+Entry point: app factory + lifespan (model loading).
+"""
+import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
 
-load_dotenv()
+from app.config import ALLOWED_ORIGINS, DEVICE, HF_MODEL_NAME, HOST, PORT
+from app.models.loader import load_model
+from app.routers import history, predict
+from app.services import inference as inference_svc
 
-from schemas import PredictRequest, PredictResponse, HistoryItem, BatchRequest, BatchResponse, BatchSummary
-from model import load_model, predict
-from database import init_db, save_prediction, get_history, delete_prediction, clear_all_predictions
-from preprocess import clean_urdu_text
-
-_origins_env = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
-ALLOWED_ORIGINS = [o.strip() for o in _origins_env.split(",")]
+logging.basicConfig(level=logging.INFO, format="%(levelname)s │ %(message)s")
+log = logging.getLogger("verdade")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await init_db()
-    load_model()  # loads on CPU
+    log.info("Starting up…")
+    inference_svc.tokenizer, inference_svc.model = load_model()
+    log.info("✅  Model ready on device: %s", DEVICE)
     yield
+    log.info("Shutting down.")
 
 
-app = FastAPI(
-    title="SachAI API",
-    description="Urdu Fake News Detection — CPU-only xlm-RoBERTa",
-    version="1.0.0",
-    lifespan=lifespan,
-)
+app = FastAPI(title="Verdade API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,69 +35,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.get("/api/health")
-async def health():
-    return {"status": "ok", "device": "cpu"}
+app.include_router(predict.router)
+app.include_router(history.router)
 
 
-@app.post("/api/predict", response_model=PredictResponse)
-async def predict_endpoint(req: PredictRequest):
-    if len(req.text.strip()) < 10:
-        raise HTTPException(status_code=400, detail="Text too short (min 10 characters)")
-    if len(req.text) > 1000:
-        raise HTTPException(status_code=400, detail="Text too long (max 1000 characters)")
-
-    result = predict(clean_urdu_text(req.text))
-    await save_prediction({**result, "full_text": req.text, "text_preview": req.text[:50]})
-    return result
+@app.get("/", tags=["health"])
+def health():
+    return {"status": "ok", "model": HF_MODEL_NAME, "device": str(DEVICE)}
 
 
-@app.post("/api/predict/batch", response_model=BatchResponse)
-async def predict_batch_endpoint(req: BatchRequest):
-    if len(req.texts) == 0:
-        raise HTTPException(status_code=400, detail="texts list cannot be empty")
-    if len(req.texts) > 10:
-        raise HTTPException(status_code=400, detail="Maximum 10 texts per batch")
-
-    results = []
-    for text in req.texts:
-        text = text.strip()
-        if len(text) < 10:
-            raise HTTPException(status_code=400, detail=f"Text too short (min 10 characters): '{text[:30]}…'")
-        if len(text) > 1000:
-            raise HTTPException(status_code=400, detail=f"Text too long (max 1000 characters)")
-        result = predict(clean_urdu_text(text))
-        await save_prediction({**result, "full_text": text, "text_preview": text[:50]})
-        results.append(result)
-
-    fake_count = sum(1 for r in results if r["prediction"] == "FAKE")
-    real_count = len(results) - fake_count
-    fake_pct = round((fake_count / len(results)) * 100, 1) if results else 0.0
-
-    summary = BatchSummary(
-        total=len(results),
-        fake=fake_count,
-        real=real_count,
-        fake_percentage=fake_pct,
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "main:app",
+        host=HOST,
+        port=PORT,
+        reload=True
     )
-    return BatchResponse(results=results, summary=summary)
-
-
-@app.get("/api/history")
-async def history_endpoint():
-    return await get_history()
-
-
-@app.delete("/api/history/{prediction_id}")
-async def delete_endpoint(prediction_id: str):
-    deleted = await delete_prediction(prediction_id)
-    if not deleted:
-        raise HTTPException(status_code=404, detail="Prediction not found")
-    return {"deleted": True}
-
-
-@app.delete("/api/history")
-async def clear_endpoint():
-    await clear_all_predictions()
-    return {"cleared": True}

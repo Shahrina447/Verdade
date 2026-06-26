@@ -43,10 +43,15 @@ export default function DetectorSection() {
 
   useEffect(() => {
     if (state === 'result' && result && meterRef.current) {
-      const pct   = Math.round(result.confidence_real * 100)
-      const color = result.prediction === 'REAL' ? '#059669' : result.prediction === 'FAKE' ? '#dc2626' : '#d97706'
+      const meterPct =
+        result.prediction === 'REAL'      ? Math.round(result.confidence_real * 100) :
+        result.prediction === 'FAKE'      ? Math.round(result.confidence_fake * 100) :
+                                            Math.round(result.confidence * 100)
+      const color =
+        result.prediction === 'REAL' ? '#059669' :
+        result.prediction === 'FAKE' ? '#dc2626' : '#d97706'
       setTimeout(() => {
-        meterRef.current?.style.setProperty('--p', String(pct))
+        meterRef.current?.style.setProperty('--p', String(meterPct))
         meterRef.current?.style.setProperty('--meter-color', color)
       }, 120)
     }
@@ -153,8 +158,17 @@ export default function DetectorSection() {
                   style={{ '--p': '0', '--meter-color': '#059669' } as React.CSSProperties}
                 >
                   <div className="w-24 h-24 rounded-full bg-white flex flex-col items-center justify-center shadow-inner">
-                    <span className="text-2xl font-black text-slate-800">{Math.round(result.confidence_real * 100)}%</span>
-                    <span className="text-[10px] font-semibold text-slate-400 mt-0.5">Credibility</span>
+                    <span className="text-2xl font-black text-slate-800">
+                      {result.prediction === 'REAL'
+                        ? Math.round(result.confidence_real * 100)
+                        : result.prediction === 'FAKE'
+                        ? Math.round(result.confidence_fake * 100)
+                        : Math.round(result.confidence * 100)}%
+                    </span>
+                    <span className="text-[10px] font-semibold text-slate-400 mt-0.5">
+                      {result.prediction === 'REAL' ? 'Credibility' :
+                       result.prediction === 'FAKE' ? 'Fake Score' : 'Confidence'}
+                    </span>
                   </div>
                 </div>
 
@@ -163,9 +177,9 @@ export default function DetectorSection() {
                   <div className="flex items-center gap-3 justify-center sm:justify-start flex-wrap">
                     <VerdictIcon p={result.prediction} />
                     <span className={`text-3xl font-black ${
-                      result.prediction === 'REAL' ? 'text-emerald-600' :
-                      result.prediction === 'FAKE' ? 'text-red-600' :
-                      'text-amber-600'
+                      result.prediction === 'REAL'      ? 'text-emerald-600' :
+                      result.prediction === 'FAKE'      ? 'text-red-600' :
+                                                          'text-amber-600'
                     }`}>
                       {result.prediction}
                     </span>
@@ -175,7 +189,18 @@ export default function DetectorSection() {
                   </div>
                   <p className="text-slate-600 text-sm leading-relaxed font-medium">{result.verdict_text}</p>
 
-                  {/* Warning for sophisticated fakes */}
+                  {/* UNCERTAIN — extra nudge to verify */}
+                  {result.prediction === 'UNCERTAIN' && (
+                    <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-amber-50 border border-amber-200">
+                      <HelpCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <p className="text-xs text-amber-700 leading-relaxed">
+                        <strong>Low confidence:</strong> The model&apos;s signals are too mixed to give a reliable verdict.
+                        Cross-check this article with a trusted news source before sharing.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Warning for high-confidence REAL — sophisticated fakes still slip through */}
                   {result.prediction === 'REAL' && result.confidence_real > 0.85 && (
                     <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl bg-amber-50 border border-amber-200">
                       <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
@@ -198,33 +223,6 @@ export default function DetectorSection() {
                 <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest">Confidence Breakdown</h4>
                 <Bar label="Real News Probability" value={result.confidence_real} color="#059669" />
                 <Bar label="Fake News Probability" value={result.confidence_fake} color="#dc2626" />
-              </div>
-
-              {/* Model performance metrics */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                <div className="flex items-center gap-2 mb-4">
-                  <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest">Model Performance</h4>
-                  <span className="text-xs font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
-                    Evaluated on 400 samples
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {[
-                    { label: 'Accuracy',  value: '94.5%', color: '#7c3aed', bg: 'from-purple-50 to-purple-100/40', border: 'border-purple-200', desc: '378 / 400 correct' },
-                    { label: 'Precision', value: '97.3%', color: '#0891b2', bg: 'from-cyan-50 to-cyan-100/40',    border: 'border-cyan-200',   desc: 'Low false alarms' },
-                    { label: 'Recall',    value: '91.5%', color: '#059669', bg: 'from-emerald-50 to-emerald-100/40', border: 'border-emerald-200', desc: 'Fake news caught' },
-                    { label: 'F1 Score',  value: '94.3%', color: '#d97706', bg: 'from-amber-50 to-amber-100/40',  border: 'border-amber-200',  desc: 'Balanced score' },
-                  ].map((m) => (
-                    <div
-                      key={m.label}
-                      className={`rounded-xl border ${m.border} px-3 py-3 text-center bg-gradient-to-b ${m.bg}`}
-                    >
-                      <div className="text-xl font-black mb-0.5" style={{ color: m.color }}>{m.value}</div>
-                      <div className="text-xs font-bold text-slate-700">{m.label}</div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">{m.desc}</div>
-                    </div>
-                  ))}
-                </div>
               </div>
 
               {/* Model note */}

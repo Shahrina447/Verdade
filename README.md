@@ -1,48 +1,75 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/سچ_کی_پہچان-Recognition_of_Truth-7c3aed?style=for-the-badge&labelColor=0b1020" alt="SachAI tagline"/>
+# 🔍 Verdade
 
-# SachAI — Urdu Fake News Detection System
+### *Truth in Every Word.*
 
-**AI-powered misinformation detection for the Urdu language using xlm-RoBERTa**
+**AI-powered Urdu fake news detection platform built on fine-tuned XLM-RoBERTa**
 
-[![Python](https://img.shields.io/badge/Python-3.12-3776ab?style=flat-square&logo=python&logoColor=white)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.2_CPU-EE4C2C?style=flat-square&logo=pytorch&logoColor=white)](https://pytorch.org)
-[![HuggingFace](https://img.shields.io/badge/🤗_Transformers-xlm--RoBERTa-FFD21E?style=flat-square)](https://huggingface.co/xlm-roberta-base)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
-[![License](https://img.shields.io/badge/License-MIT-10b981?style=flat-square)](LICENSE)
-
-<br/>
-
-[Overview](#overview) · [Features](#features) · [Tech Stack](#tech-stack) · [Project Structure](#project-structure) · [Setup & Run](#setup--run) · [Model](#model) · [Model Performance](#model-performance) · [API Reference](#api-reference) · [Dataset](#dataset) · [Developer](#developer)
+![Python](https://img.shields.io/badge/Python-3.13+-3776AB?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.138+-009688?style=flat-square&logo=fastapi&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-16.2.9-000000?style=flat-square&logo=next.js&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.12+-EE4C2C?style=flat-square&logo=pytorch&logoColor=white)
+![XLM-RoBERTa](https://img.shields.io/badge/XLM--RoBERTa-base-4285F4?style=flat-square&logo=huggingface&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
 
 </div>
 
 ---
 
-## Overview
+## What Is Verdade
 
-SachAI is a full-stack NLP web application that detects misinformation in Urdu news articles using a fine-tuned **xlm-RoBERTa** transformer model. A user pastes any Urdu text and receives an instant verdict — **REAL** or **FAKE** — with a confidence percentage and a human-readable explanation.
+Verdade is an NLP-powered fake news detection system specifically built for Urdu language content. It uses a fine-tuned XLM-RoBERTa model trained on a curated Urdu news dataset to classify articles as **REAL**, **FAKE**, or **UNCERTAIN** — with confidence scores, credibility breakdowns, and human-readable verdicts.
 
-The model is fine-tuned on a **combined corpus** of Ax-to-Grind Urdu (~10K samples) and Hook & Bait Urdu (~34K balanced samples), totalling ~44K training examples across two datasets. The backend runs entirely on CPU using PyTorch float32, no GPU required.
+Pakistan is among the world's most affected countries by misinformation spread through social media in Urdu. Existing fact-checking tools are either English-only or rely on manual review. Verdade solves this by providing instant, automated, language-native detection that anyone can use.
 
 ---
 
-## Features
+## How It Works
 
-| Feature | Description |
-|---|---|
-| Instant verdict | Paste any Urdu text and get REAL / FAKE with confidence % |
-| Credibility meter | Animated circular meter color-coded by verdict |
-| Sample texts | 3 pre-loaded Urdu articles for quick demo |
-| Batch analysis | Test up to 10 articles at once |
-| Prediction history | Full log with per-item delete and bulk clear |
-| Urdu rendering | Native RTL text with Noto Nastaliq Urdu font |
-| Text normalization | Arabic-to-Urdu character fix (`ي → ی`, `ك → ک`, `ه → ہ`) |
-| CPU inference | Runs on any machine, no GPU needed |
-| Persistent storage | SQLite database for prediction history |
+```
+User pastes Urdu news text
+          ↓
+Tokenization (XLM-RoBERTa tokenizer, max 256 tokens)
+          ↓
+Fine-tuned XLM-RoBERTa forward pass
+          ↓
+Softmax → conf_real (label 0) + conf_fake (label 1)
+          ↓
+  ┌───────────────────────────────────┐
+  │  Post-processing pipeline         │
+  │                                   │
+  │  Step 1: Confidence threshold     │
+  │  max(conf) < 0.65 → UNCERTAIN     │
+  │                                   │
+  │  Step 2: Heuristic override       │
+  │  conspiracy/miracle-cure patterns │
+  │  → force FAKE (≥ 80% confidence)  │
+  └───────────────────────────────────┘
+          ↓
+Structured response — prediction, confidence,
+confidence_real, confidence_fake, verdict_text
+          ↓
+Persisted to history.json with UUID + timestamp
+          ↓
+Next.js frontend renders result with
+animated credibility meter + confidence bars
+```
+
+---
+
+## Key Features
+
+- **Fine-tuned XLM-RoBERTa** — multilingual transformer trained specifically on Urdu news data
+- **Three-state output** — REAL, FAKE, or UNCERTAIN (no forced binary when model isn't confident)
+- **Confidence threshold** — predictions below 65% return UNCERTAIN instead of a wrong label
+- **Heuristic override layer** — 24 Urdu conspiracy/miracle-cure patterns catch sophisticated misinformation the model misses
+- **Batch analysis** — analyze up to 50 articles at once with aggregate summary stats
+- **Prediction history** — all analyses persisted to JSON with UUID, timestamp, and text preview
+- **RTL Urdu rendering** — native right-to-left text display with proper Urdu font support
+- **Sample articles** — three built-in samples (real, fake, real) to test the detector instantly
+- **Animated result UI** — circular credibility meter, animated confidence bars, color-coded verdict cards
+- **Structured backend** — clean separation into config / models / schemas / services / routers
 
 ---
 
@@ -50,336 +77,252 @@ The model is fine-tuned on a **combined corpus** of Ax-to-Grind Urdu (~10K sampl
 
 | Layer | Technology | Purpose |
 |---|---|---|
-| Frontend | Next.js 14 + TypeScript | UI, detector, history page |
-| Styling | Tailwind CSS + custom CSS | Dark theme, RTL Urdu support |
-| HTTP Client | Axios | API calls from frontend |
-| Backend | FastAPI 0.111 + Python 3.12 | REST API, inference pipeline |
-| Server | Uvicorn | ASGI server |
-| Validation | Pydantic v2 | Request/response models |
-| Database | SQLite via aiosqlite | Prediction history storage |
-| ML Framework | PyTorch 2.2 (CPU-only) | Model inference |
-| NLP Library | HuggingFace Transformers 4.40 | Tokenizer + model loading |
-| Base Model | xlm-roberta-base | 278M param multilingual transformer |
+| Frontend | Next.js 16.2.9 + Tailwind CSS 3.4 | UI, detector, batch analyzer, history page |
+| Frontend State | React 19.2.4 | Component state management |
+| HTTP Client | Axios 1.18 | Frontend → backend API calls |
+| Backend | FastAPI 0.138 (Python 3.13) | REST API, request validation, CORS |
+| Model | XLM-RoBERTa base (fine-tuned) | Urdu fake news classification |
+| ML Framework | PyTorch 2.12 | Model inference |
+| Transformers | HuggingFace Transformers 5.12 | Tokenizer + model architecture |
+| Tokenizer | SentencePiece 0.2 | XLM-RoBERTa subword tokenization |
+| Config | python-dotenv 1.0 | Environment variable management |
+| Server | Uvicorn 0.49 | ASGI server |
+| Package Manager | `uv` | Python dependency management |
+| History | JSON file | Lightweight prediction persistence |
 
 ---
 
 ## Project Structure
 
 ```
-SachAI/
-├── .gitignore
+Verdade/
 ├── README.md
+├── .gitignore
 │
 ├── backend/
-│   ├── main.py                  # FastAPI app, routes, CORS, lifespan
-│   ├── model.py                 # xlm-RoBERTa inference (CPU-only)
-│   ├── preprocess.py            # Urdu text normalization & cleaning
-│   ├── schemas.py               # Pydantic request/response models
-│   ├── database.py              # SQLite CRUD for prediction history
-│   ├── evaluate.py              # Model evaluation script
-│   ├── synthetic_test.csv       # Hand-crafted synthetic test data
-│   ├── requirements.txt
-│   ├── .env.example
-│   └── saved_model/             # Trained weights — not in git (1.1 GB)
-│       ├── config.json
-│       ├── tokenizer.json
-│       ├── tokenizer_config.json
-│       ├── special_tokens_map.json
-│       └── model.safetensors
+│   ├── main.py                        # App factory, lifespan, CORS, router registration
+│   ├── pyproject.toml                 # Python dependencies (managed by uv)
+│   ├── .env                           # HOST, PORT, ALLOWED_ORIGINS
+│   ├── .python-version                # Pins Python 3.13
+│   ├── xlmroberta_urdu_best.pt        # Fine-tuned model checkpoint (~1.1 GB)
+│   │
+│   ├── app/
+│   │   ├── config.py                  # All constants, paths, device, reads .env
+│   │   │
+│   │   ├── models/
+│   │   │   └── loader.py              # Loads .pt checkpoint (handles 3 save formats)
+│   │   │
+│   │   ├── schemas/
+│   │   │   ├── predict.py             # PredictRequest, PredictResponse, BatchRequest/Response
+│   │   │   └── history.py             # HistoryItem schema
+│   │   │
+│   │   ├── services/
+│   │   │   ├── inference.py           # Tokenize → forward pass → heuristics → verdict
+│   │   │   └── history.py             # load / save / append / delete history.json
+│   │   │
+│   │   └── routers/
+│   │       ├── predict.py             # POST /api/predict, POST /api/predict/batch
+│   │       └── history.py             # GET/DELETE /api/history, DELETE /api/history/{id}
+│   │
+│   └── data/
+│       └── history.json               # Auto-created on first prediction
 │
 └── frontend/
-    ├── app/
-    │   ├── layout.tsx
-    │   ├── page.tsx
-    │   ├── globals.css
-    │   └── history/
-    │       └── page.tsx
-    ├── components/
-    │   ├── Navbar.tsx
-    │   ├── HeroSection.tsx
-    │   ├── DetectorSection.tsx
-    │   ├── BatchAnalyzer.tsx
-    │   ├── HowItWorks.tsx
-    │   ├── StatsSection.tsx
-    │   ├── FeaturesSection.tsx
-    │   ├── MarqueeSection.tsx
-    │   ├── CTASection.tsx
-    │   └── Footer.tsx
-    ├── lib/
-    │   └── api.ts
     ├── package.json
-    └── tailwind.config.ts
+    ├── next.config.ts                 # API rewrites → localhost:8000
+    ├── tailwind.config.js
+    ├── tsconfig.json
+    ├── .env / .env.local              # NEXT_PUBLIC_API_URL
+    │
+    └── src/
+        ├── app/
+        │   ├── layout.tsx             # Root layout, global fonts
+        │   ├── page.tsx               # Landing page — assembles all sections
+        │   └── history/
+        │       └── page.tsx           # Prediction history page
+        │
+        ├── components/
+        │   ├── Navbar.tsx             # Top navigation bar
+        │   ├── HeroSection.tsx        # Landing hero with tagline
+        │   ├── DetectorSection.tsx    # Main detector — input, result, meter, bars
+        │   ├── BatchAnalyzer.tsx      # Multi-article batch analysis
+        │   ├── FeaturesSection.tsx    # Feature highlights
+        │   ├── HowItWorks.tsx         # Pipeline explanation
+        │   ├── StatsSection.tsx       # Model accuracy stats
+        │   ├── MarqueeSection.tsx     # Scrolling news ticker
+        │   ├── CTASection.tsx         # Call to action
+        │   └── Footer.tsx             # Site footer
+        │
+        └── lib/
+            └── api.ts                 # Typed API client (axios wrappers)
 ```
 
 ---
 
 ## Prerequisites
 
-| Tool | Version | Install |
-|---|---|---|
-| Python | 3.12 | [python.org](https://python.org) |
-| Node.js | 18+ | [nodejs.org](https://nodejs.org) |
-| npm | 9+ | Comes with Node.js |
-
----
-
-## Setup & Run
-
-### 1 · Clone
-
-```bash
-git clone https://github.com/Shahrina447/SachAI.git
-cd SachAI
-```
-
-### 2 · Backend
-
-```bash
-cd backend
-
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate          # Windows: venv\Scripts\activate
-
-# Install CPU-only PyTorch first (required before requirements.txt)
-pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cpu
-
-# Install remaining dependencies
-pip install -r requirements.txt
-
-# Set up environment
-cp .env.example .env
-
-# Place trained model files in backend/saved_model/
-# Required files: config.json, tokenizer.json, tokenizer_config.json,
-#                 special_tokens_map.json, model.safetensors
-
-# Start the server
-uvicorn main:app --reload --port 8000
-```
-
-### 3 · Frontend
-
-```bash
-cd frontend
-cp .env.example .env.local
-npm install
-npm run dev
-# → http://localhost:3000
-```
-
-### 4 · Verify
-
-```bash
-# Health check
-curl http://localhost:8000/api/health
-
-# Test prediction
-curl -s -X POST http://localhost:8000/api/predict \
-  -H "Content-Type: application/json" \
-  -d '{"text": "سائنسدانوں نے دعویٰ کیا کہ گرم پانی سے کینسر مکمل طور پر ختم ہو جاتا ہے!"}' \
-  | python3 -m json.tool
-```
+- Python 3.13+
+- Node.js 18+
+- [`uv`](https://docs.astral.sh/uv/getting-started/installation/) — Python package manager
+- The trained model file `xlmroberta_urdu_best.pt` placed in `backend/`
 
 ---
 
 ## Environment Variables
 
-**`backend/.env`**
-```env
-HOST=127.0.0.1
-PORT=8000
-MODEL_PATH=./saved_model
-REAL_THRESHOLD=0.55        # min confidence to label as REAL
-TEMPERATURE=1.5            # softmax temperature scaling
-DB_PATH=./predictions.db
-ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+### Backend (`backend/.env`)
+
+| Variable | Default | Description |
+|---|---|---|
+| `HOST` | `localhost` | Server bind host |
+| `PORT` | `8000` | Server bind port |
+| `ALLOWED_ORIGINS` | `http://localhost:3000` | Comma-separated CORS origins |
+
+### Frontend (`frontend/.env.local`)
+
+| Variable | Default | Description |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | `http://localhost:8000` | Backend base URL |
+
+---
+
+## Running the Backend
+
+```bash
+# 1. Navigate to backend
+cd backend
+
+# 2. Create .env
+echo "HOST=localhost" > .env
+echo "PORT=8000" >> .env
+echo "ALLOWED_ORIGINS=http://localhost:3000" >> .env
+
+# 3. Install dependencies
+uv sync
+
+# 4. Start the server
+uvicorn main:app --reload
 ```
 
-**`frontend/.env.local`**
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000
+Backend runs at **http://localhost:8000**
+
+On first startup the tokenizer is downloaded from HuggingFace (~1 MB) and cached.
+The model checkpoint loads from `xlmroberta_urdu_best.pt` — takes ~15–30s on CPU.
+
+---
+
+## Running the Frontend
+
+```bash
+# 1. Navigate to frontend
+cd frontend
+
+# 2. Install dependencies
+npm install
+
+# 3. Start dev server
+npm run dev
 ```
 
----
-
-## Model
-
-### Architecture
-
-**Base:** `xlm-roberta-base` — a multilingual transformer pre-trained on 100 languages including Urdu (278M parameters).
-
-**Task:** Binary sequence classification — `FAKE (0)` vs `TRUE (1)`
-
-### Training
-
-Fine-tuned on Google Colab (T4 GPU) using HuggingFace `Trainer` API on a combined dataset of Ax-to-Grind Urdu and Hook & Bait Urdu.
-
-| Parameter | Value |
-|---|---|
-| Base model | xlm-roberta-base |
-| Max token length | 128 |
-| Batch size | 16 |
-| Epochs | 2 |
-| Learning rate | 2e-5 |
-| Weight decay | 0.01 |
-| Precision | float32 (CPU inference) |
-
-### Inference Settings
-
-| Setting | Value | Purpose |
-|---|---|---|
-| Temperature | 1.5 | Softens overconfident softmax scores |
-| REAL threshold | 0.55 | Model must be ≥55% confident to label REAL |
-| Device | CPU | No GPU required |
-
-> Model weights (`model.safetensors`, 1.1 GB) are not stored in this repository. Place trained files in `backend/saved_model/` before running.
+Frontend runs at **http://localhost:3000**
 
 ---
 
-## Model Performance
+## API Endpoints
 
-### Test 1 — Combined Dataset Held-Out Test
-*1000 balanced samples (500 FAKE + 500 TRUE) from training distribution*
+| Method | Endpoint | Body | Response |
+|---|---|---|---|
+| `GET` | `/` | — | `{ status, model, device }` |
+| `POST` | `/api/predict` | `{ text }` | `PredictResponse` |
+| `POST` | `/api/predict/batch` | `{ texts[] }` | `BatchResponse` |
+| `GET` | `/api/history` | — | `HistoryItem[]` |
+| `DELETE` | `/api/history/{id}` | — | `{ deleted: id }` |
+| `DELETE` | `/api/history` | — | `{ cleared: true }` |
 
-| Metric | Value |
-|---|---|
-| Accuracy | **94.40%** |
-| Precision | 0.9784 |
-| Recall | 0.9080 |
-| F1 Score | 0.9419 |
+### PredictResponse
 
-| | Predicted FAKE | Predicted TRUE |
-|---|---|---|
-| **Actual FAKE** | 454 TP | 46 FN |
-| **Actual TRUE** | 10 FP | 490 TN |
-
----
-
-### Test 2 — Synthetic Out-of-Distribution Test
-*50 hand-crafted Urdu news articles (25 FAKE + 25 TRUE) — completely outside training data*
-
-| Metric | Value |
-|---|---|
-| Accuracy | **84.00%** |
-| Precision | 1.0000 |
-| Recall | 0.6800 |
-| F1 Score | 0.8095 |
-
-| | Predicted FAKE | Predicted TRUE |
-|---|---|---|
-| **Actual FAKE** | 17 TP | 8 FN |
-| **Actual TRUE** | 0 FP | 25 TN |
-
-**Key observations:**
-- Precision = 1.0 — zero false alarms, every FAKE prediction was correct
-- 8 missed fake news were all written in neutral journalistic tone — a known challenge in NLP
-- 0 real news incorrectly flagged as fake
-
----
-
-### Performance Summary
-
-| Test Set | Type | Samples | Accuracy | F1 |
-|---|---|---|---|---|
-| Combined dataset | In-distribution | 1000 | **94.4%** | 0.942 |
-| Synthetic data | Out-of-distribution | 50 | **84.0%** | 0.810 |
-
-Retraining on a combined dataset improved cross-domain accuracy from 74.5% (single dataset) to 94.4%.
-
----
-
-## API Reference
-
-Base URL: `http://localhost:8000`
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/health` | Server health check |
-| `POST` | `/api/predict` | Analyze a single Urdu text |
-| `POST` | `/api/predict/batch` | Analyze up to 10 texts |
-| `GET` | `/api/history` | Fetch last 50 predictions |
-| `DELETE` | `/api/history/{id}` | Delete a specific prediction |
-| `DELETE` | `/api/history` | Clear all predictions |
-
-### POST /api/predict
-
-**Request**
-```json
-{ "text": "اردو خبر کا متن یہاں — 10 to 1000 characters" }
-```
-
-**Response**
 ```json
 {
-  "prediction": "FAKE",
-  "confidence": 0.997,
-  "confidence_real": 0.003,
-  "confidence_fake": 0.997,
-  "verdict_text": "✗ Strong misinformation indicators detected.",
-  "prediction_id": "550e8400-e29b-41d4-a716-446655440000",
-  "timestamp": "2025-06-19T10:00:00"
+  "prediction":      "FAKE",
+  "confidence":      0.8312,
+  "confidence_real": 0.1688,
+  "confidence_fake": 0.8312,
+  "verdict_text":    "High likelihood of misinformation detected (83% confidence). Do not share without verification.",
+  "prediction_id":   "a3f1c2d4-...",
+  "timestamp":       "2026-06-26T10:45:00+00:00"
 }
 ```
 
-**Error codes**
+### BatchResponse
 
-| Status | Reason |
-|---|---|
-| `400` | Text shorter than 10 characters |
-| `400` | Text longer than 1000 characters |
-| `422` | Malformed request body |
-| `500` | Internal inference error |
-
----
-
-## Dataset
-
-### Training Data
-
-The model was trained on a **combined dataset** of two Urdu fake news corpora:
-
-| Dataset | Samples | FAKE | TRUE | Source |
-|---|---|---|---|---|
-| Ax-to-Grind Urdu | 10,083 | 5,053 | 5,030 | [arXiv:2403.14037](https://arxiv.org/abs/2403.14037) |
-| Hook & Bait Urdu | ~34,412 (balanced) | 17,206 | 17,206 | Internal corpus |
-| **Combined Total** | **~44,495** | **~22,259** | **~22,236** | — |
-
-Hook & Bait was class-balanced by downsampling the TRUE class (42,179 → 17,206) to match FAKE count before combining. The final combined dataset was shuffled with a fixed random seed (42) before training.
-
-### Evaluation Data
-
-| Dataset | Samples | Type | Role |
-|---|---|---|---|
-| Combined held-out test | 1,000 | Balanced (500 FAKE + 500 TRUE) | In-distribution evaluation |
-| Synthetic Urdu news | 50 | Hand-crafted (25 FAKE + 25 TRUE) | Out-of-distribution evaluation |
-
-> Dataset files are not included in this repository. Download Ax-to-Grind from the source above.
-
----
-
-## Running the Evaluation Script
-
-```bash
-cd backend
-source venv/bin/activate
-
-# Evaluate on any labeled CSV
-python evaluate.py --file test.csv --text-col "News Items" --label-col Label
-
-# Balanced random sample (faster)
-python evaluate.py --file test.csv --text-col "News Items" --label-col Label --sample 200
-
-# Evaluate on synthetic test data
-python evaluate.py --file synthetic_test.csv --text-col "News Items" --label-col Label
+```json
+{
+  "results": [ ...PredictResponse[] ],
+  "summary": {
+    "total": 3,
+    "fake":  2,
+    "real":  1,
+    "fake_percentage": 66.7
+  }
+}
 ```
 
-Output includes accuracy, precision, recall, F1, confusion matrix, and a detailed `*_results.csv` file.
+---
+
+## Model Details
+
+| Property | Value |
+|---|---|
+| Base model | `xlm-roberta-base` (FacebookAI) |
+| Fine-tuning task | Binary sequence classification |
+| Classes | `0 → REAL`, `1 → FAKE` |
+| Max token length | 256 |
+| Training data | Urdu news dataset (`combined_urdu_news.csv`) |
+| Checkpoint size | ~1.1 GB |
+| Inference device | CUDA if available, else CPU |
 
 ---
 
-## Developer
+## Post-Processing Pipeline
 
+### Confidence Threshold (Option 3)
+
+If the model's max confidence is below **65%**, the prediction is returned as `UNCERTAIN` instead of forcing a potentially wrong label. The UI renders this in amber with a manual verification prompt.
+
+| Confidence | Outcome |
+|---|---|
+| ≥ 65% | REAL or FAKE |
+| < 65% | UNCERTAIN |
+
+### Heuristic Override Layer (Option 1)
+
+24 Urdu regex patterns catch sophisticated misinformation the model may miss — formally-written conspiracy claims, miracle-cure pseudoscience, and government-suppression framing. When matched, the prediction is forced to **FAKE** with at least 80% confidence and both `confidence_real`/`confidence_fake` are adjusted to stay consistent with the verdict.
+
+Pattern categories:
+- **Suppression / cover-up** — e.g. حکومت چھپا رہی, میڈیا چھپا رہا
+- **Miracle cures / pseudoscience** — e.g. تمام بیماریاں ٹھیک, کینسر ختم
+- **Unverifiable sensational claims** — e.g. معجزاتی علاج, جادوئی دوا
+- **Conspiracy framing** — e.g. بڑا انکشاف, سازش کا انکشاف
+
+---
+
+## Checkpoint Loading
+
+The `loader.py` handles three common PyTorch save formats automatically:
+
+| Format | How saved | How loaded |
+|---|---|---|
+| Full model | `torch.save(model)` | Used directly |
+| Bare state dict | `torch.save(model.state_dict())` | Wrapped in XLM-RoBERTa architecture |
+| Wrapped dict | `torch.save({"model_state_dict": ...})` | Extracted and wrapped |
+
+`AutoConfig.from_pretrained` is used instead of `from_pretrained` to avoid re-downloading the 1 GB base weights — only the ~1 KB config JSON is fetched, then the architecture is built in memory before loading your weights.
+
+---
+
+*Verdade is an academic NLP project for course demonstration purposes. Model accuracy depends on training data distribution. Always verify important news through trusted, authoritative sources before sharing.*
+
+## Developer
 **Shahrina Khan**  
 Computer Science Student — UMT Sialkot  
 GitHub: [@Shahrina447](https://github.com/Shahrina447)
