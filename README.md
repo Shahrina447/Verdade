@@ -269,15 +269,35 @@ Frontend runs at **http://localhost:3000**
 
 ---
 
+## Dataset
+
+The model was trained and evaluated on the **Combined Urdu News Dataset** — a curated collection of labelled Urdu news articles covering real reporting and misinformation/fact-checking content.
+
+| Property | Value |
+|---|---|
+| **Dataset** | Combined Urdu News Dataset |
+| **Repository** | [github.com/Shahrina447/urdu-news-dataset](https://github.com/Shahrina447/urdu-news-dataset) |
+| **Language** | Urdu (RTL script) |
+| **Task** | Binary classification — FAKE vs TRUE |
+| **Label 0** | FAKE — debunking / fact-checking headlines |
+| **Label 1** | TRUE — genuine news articles |
+| **Total samples** | 10,421 |
+| **Class split** | FAKE: 3,339 (32%) · TRUE: 7,082 (68%) |
+| **Test split** | 400 stratified samples (200 FAKE + 200 TRUE) |
+
+The FAKE class consists of fact-checking style headlines — articles that debunk viral misinformation, misattributed images/videos, and false claims circulating on social media. The TRUE class contains genuine, factual Urdu news from politics, sports, health, science, and international affairs.
+
+---
+
 ## Model Details
 
 | Property | Value |
 |---|---|
 | Base model | `xlm-roberta-base` (FacebookAI) |
 | Fine-tuning task | Binary sequence classification |
-| Classes | `0 → REAL`, `1 → FAKE` |
+| Classes | `0 → FAKE`, `1 → TRUE` |
 | Max token length | 256 |
-| Training data | Urdu news dataset (`combined_urdu_news.csv`) |
+| Training data | [Combined Urdu News Dataset](https://github.com/Shahrina447/urdu-news-dataset) |
 | Checkpoint size | ~1.1 GB |
 | Inference device | CUDA if available, else CPU |
 
@@ -285,34 +305,64 @@ Frontend runs at **http://localhost:3000**
 
 ## Evaluation Results
 
-> Results on the **test portion** of the Urdu news dataset — 400 stratified samples (200 REAL + 200 FAKE) drawn from `test.csv` using `evaluate.py`.
+Two evaluations were run using `evaluate.py` — one on a held-out slice of the training dataset, and one on fully synthetic unseen data matching the same format.
 
-### Overall Metrics
+### Test 1 — In-Distribution Test Set (test.csv)
+
+> 400 stratified samples (200 FAKE + 200 TRUE) drawn from `test.csv` — the held-out portion of the [Combined Urdu News Dataset](https://github.com/Shahrina447/urdu-news-dataset).
 
 | Metric | Score |
 |---|---|
 | **Accuracy** | **98.00%** |
 | **ROC-AUC** | **0.9976** |
-| **MCC (Matthews Corr. Coef.)** | **0.9600** |
-| **F1 — Macro Average** | **0.9800** |
-
-### Per-Class Report
+| **MCC** | **0.9600** |
+| **F1 (macro avg)** | **0.9800** |
 
 | Class | Precision | Recall | F1-Score | Support |
 |---|---|---|---|---|
-| REAL (0) | 0.9800 | 0.9800 | 0.9800 | 200 |
-| FAKE (1) | 0.9800 | 0.9800 | 0.9800 | 200 |
+| FAKE (0) | 0.9800 | 0.9800 | 0.9800 | 200 |
+| TRUE (1) | 0.9800 | 0.9800 | 0.9800 | 200 |
 | **Macro avg** | **0.9800** | **0.9800** | **0.9800** | 400 |
 
-### Confusion Matrix
+```
+Confusion Matrix
+               Pred FAKE   Pred TRUE
+True FAKE          196           4
+True TRUE            4         196
+```
+
+> Note: the high accuracy here reflects strong in-distribution performance. The model has learned the specific vocabulary and patterns of this dataset.
+
+---
+
+### Test 2 — Synthetic Unseen Data (synthetic_400.csv)
+
+> 400 hand-crafted synthetic Urdu news samples (200 FAKE + 200 TRUE) generated using `generate_synthetic.py` — matching the exact style, format, and linguistic patterns of `test.csv` but containing no text from the training data. This gives a more honest estimate of real-world generalisation.
+
+| Metric | Score |
+|---|---|
+| **Accuracy** | **88.75%** |
+| **ROC-AUC** | **1.0000** |
+| **MCC** | **0.7954** |
+| **F1 (macro avg)** | **0.8861** |
+
+| Class | Precision | Recall | F1-Score | Support |
+|---|---|---|---|---|
+| FAKE (0) | 0.8163 | 1.0000 | 0.8989 | 200 |
+| TRUE (1) | 1.0000 | 0.7750 | 0.8732 | 200 |
+| **Macro avg** | **0.9082** | **0.8875** | **0.8861** | 400 |
 
 ```
-               Pred REAL   Pred FAKE
-True REAL          196           4
-True FAKE            4         196
+Confusion Matrix
+               Pred FAKE   Pred TRUE
+True FAKE          200           0
+True TRUE           45         155
 ```
 
-Only **8 misclassifications out of 400** samples — perfectly balanced errors across both classes (4 false positives, 4 false negatives).
+Key observations:
+- The model **perfectly identifies all FAKE/debunking headlines** (recall = 1.0) — it has strongly learned the linguistic patterns of fact-checking language in Urdu.
+- **45 TRUE news** headlines were misclassified as FAKE — short, neutral factual sentences can lack the strong contextual signals the model relies on.
+- The ROC-AUC of **1.0** means the model's confidence scores are perfectly ranked even when the hard prediction is wrong.
 
 ---
 
