@@ -38,7 +38,7 @@ export default function CTASection() {
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a
-                href="https://github.com/MaazAmjad/Datasets-for-Urdu-news"
+                href="https://github.com/Shahrina447/urdu-news-dataset"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-9 py-4 rounded-2xl bg-white border border-slate-200 text-slate-700 font-bold flex items-center justify-center gap-2.5 hover:border-purple-300 hover:shadow-lg hover:shadow-purple-50 transition-all"
