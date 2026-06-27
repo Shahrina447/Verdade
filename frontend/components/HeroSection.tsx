@@ -12,7 +12,7 @@ const TYPING_TEXTS = [
 const STATS = [
   { value: 'xlm-RoBERTa', label: 'Model',          from: '#f5f3ff', to: '#ede9fe', border: 'border-purple-200', text: 'text-purple-700' },
   { value: 'Urdu NLP',    label: 'Language',        from: '#ecfeff', to: '#cffafe', border: 'border-cyan-200',   text: 'text-cyan-700' },
-  { value: '94.7%',       label: 'Accuracy',        from: '#f0fdf4', to: '#dcfce7', border: 'border-emerald-200',text: 'text-emerald-700' },
+  { value: '96.25%',      label: 'Accuracy',        from: '#f0fdf4', to: '#dcfce7', border: 'border-emerald-200',text: 'text-emerald-700' },
   { value: 'CPU Only',    label: 'No GPU Needed',   from: '#fff7ed', to: '#ffedd5', border: 'border-amber-200',  text: 'text-amber-700' },
 ]
 

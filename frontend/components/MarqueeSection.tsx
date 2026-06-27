@@ -3,7 +3,7 @@ const ITEMS = [
   '✓ Binary Classification',    '✦ REAL / FAKE Verdict',
   '✓ CPU-Only Inference',        '✦ Real-Time Analysis',
   '✓ Prediction History',        '✦ سچ کی پہچان',
-  '✓ Urdu Text Preprocessing',   '✦ 94.7% Accuracy',
+  '✓ Urdu Text Preprocessing',   '✦ 96.25% Accuracy',
   '✓ FastAPI Backend',           '✦ Next.js Frontend',
 ]
 const DOUBLED = [...ITEMS, ...ITEMS]

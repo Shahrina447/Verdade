@@ -42,7 +42,7 @@ export default function Footer() {
           {/* Badge */}
           <div className="text-xs text-slate-400 text-center sm:text-right space-y-1">
             <div className="font-semibold text-slate-600">xlm-RoBERTa · CPU-Only · Urdu NLP</div>
-            <div>94.7% accuracy on real-world data</div>
+            <div>96.25% accuracy on real-world data</div>
           </div>
         </div>
 

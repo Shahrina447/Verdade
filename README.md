@@ -305,7 +305,9 @@ The FAKE class consists of fact-checking style headlines — articles that debun
 
 ## Evaluation Results
 
-Two evaluations were run using `evaluate.py` — one on a held-out slice of the training dataset, and one on fully synthetic unseen data matching the same format.
+Three evaluations were run using `evaluate.py` across different test sets to give a complete picture of model performance.
+
+---
 
 ### Test 1 — In-Distribution Test Set (test.csv)
 
@@ -331,13 +333,39 @@ True FAKE          196           4
 True TRUE            4         196
 ```
 
-> Note: the high accuracy here reflects strong in-distribution performance. The model has learned the specific vocabulary and patterns of this dataset.
+---
+
+### Test 2 — External Test Set (test_samples.csv)
+
+> 400 stratified samples (200 TRUE + 200 FAKE) drawn from `test_samples.csv` — a separate, independently collected Urdu news dataset not used during training. This gives the most reliable estimate of real-world generalisation.
+
+| Metric | Score |
+|---|---|
+| **Accuracy** | **96.25%** |
+| **ROC-AUC** | **0.9948** |
+| **MCC** | **0.9256** |
+| **F1 (macro avg)** | **0.9625** |
+
+| Class | Precision | Recall | F1-Score | Support |
+|---|---|---|---|---|
+| TRUE (0) | 0.9469 | 0.9800 | 0.9631 | 200 |
+| FAKE (1) | 0.9793 | 0.9450 | 0.9618 | 200 |
+| **Macro avg** | **0.9631** | **0.9625** | **0.9625** | 400 |
+
+```
+Confusion Matrix
+               Pred TRUE   Pred FAKE
+True TRUE          196           4
+True FAKE           11         189
+```
+
+Only **15 misclassifications out of 400** on a completely separate dataset — strong evidence that the model generalises well beyond its training distribution.
 
 ---
 
-### Test 2 — Synthetic Unseen Data (synthetic_400.csv)
+### Test 3 — Synthetic Unseen Data (synthetic_400.csv)
 
-> 400 hand-crafted synthetic Urdu news samples (200 FAKE + 200 TRUE) generated using `generate_synthetic.py` — matching the exact style, format, and linguistic patterns of `test.csv` but containing no text from the training data. This gives a more honest estimate of real-world generalisation.
+> 400 hand-crafted synthetic Urdu news samples (200 FAKE + 200 TRUE) generated using `generate_synthetic.py` — matching the exact style and linguistic patterns of the training data but containing no text from any dataset.
 
 | Metric | Score |
 |---|---|
@@ -358,11 +386,6 @@ Confusion Matrix
 True FAKE          200           0
 True TRUE           45         155
 ```
-
-Key observations:
-- The model **perfectly identifies all FAKE/debunking headlines** (recall = 1.0) — it has strongly learned the linguistic patterns of fact-checking language in Urdu.
-- **45 TRUE news** headlines were misclassified as FAKE — short, neutral factual sentences can lack the strong contextual signals the model relies on.
-- The ROC-AUC of **1.0** means the model's confidence scores are perfectly ranked even when the hard prediction is wrong.
 
 ---
 

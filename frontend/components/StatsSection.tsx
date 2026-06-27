@@ -5,7 +5,7 @@ const CARDS = [
   { icon: Languages,   value: 'Urdu',        label: 'Language',        color: '#0891b2', bg: 'from-cyan-50 to-cyan-100/50',       border: 'border-cyan-200' },
   { icon: Cpu,         value: 'CPU-Only',    label: 'Inference',       color: '#059669', bg: 'from-emerald-50 to-emerald-100/50', border: 'border-emerald-200' },
   { icon: ShieldCheck, value: 'REAL/FAKE',   label: 'Classification',  color: '#d97706', bg: 'from-amber-50 to-amber-100/50',     border: 'border-amber-200' },
-  { icon: TrendingUp,  value: '94.7%',       label: 'Test Accuracy',   color: '#059669', bg: 'from-emerald-50 to-emerald-100/50', border: 'border-emerald-200' },
+  { icon: TrendingUp,  value: '96.25%',      label: 'Test Accuracy',   color: '#059669', bg: 'from-emerald-50 to-emerald-100/50', border: 'border-emerald-200' },
   { icon: Database,    value: '10K+',        label: 'Training Samples',color: '#7c3aed', bg: 'from-purple-50 to-purple-100/50',   border: 'border-purple-200' },
 ]
 

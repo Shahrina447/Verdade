@@ -31,17 +31,22 @@ from app.config import DEVICE, MAX_LEN
 from app.models.loader import load_model
 
 # ── Config ─────────────────────────────────────────────────────────────────────
-CSV_PATH   = Path(__file__).parent / "synthetic_400.csv"
+CSV_PATH   = Path(__file__).parent / "test_samples.csv"
 BATCH_SIZE = 16
+
+# test_samples.csv label convention: 0 = TRUE news, 1 = FAKE news
+# We remap to match model space where probe auto-detects FAKE index
+CSV_FAKE_LABEL = 1   # what the CSV uses for FAKE
+CSV_TRUE_LABEL = 0   # what the CSV uses for TRUE
 
 
 def probe_label_order(df: pd.DataFrame, tokenizer, model) -> int:
     """
-    Runs one known FAKE and one known REAL sample through the model
+    Runs one known FAKE and one known TRUE sample through the model
     and returns which output index corresponds to FAKE.
     """
-    fake_text = df[df["label"] == 1]["News Items"].iloc[0]
-    real_text = df[df["label"] == 0]["News Items"].iloc[0]
+    fake_text = df[df["label"] == CSV_FAKE_LABEL]["text"].iloc[0]
+    real_text = df[df["label"] == CSV_TRUE_LABEL]["text"].iloc[0]
 
     results = {}
     for name, text in [("fake", fake_text), ("real", real_text)]:
@@ -87,10 +92,12 @@ def predict_batch(texts: list[str], tokenizer, model, fake_idx: int) -> tuple[li
         raw_pred = torch.argmax(probs, dim=-1)   # model-space index
 
         if fake_idx == 1:
-            preds     = raw_pred.tolist()
+            # model index 1 = FAKE → CSV_FAKE_LABEL, model index 0 = TRUE → CSV_TRUE_LABEL
+            preds     = [CSV_FAKE_LABEL if p == 1 else CSV_TRUE_LABEL for p in raw_pred.tolist()]
             fake_prob = probs[:, 1].tolist()
         else:
-            preds     = (1 - raw_pred).tolist()
+            # model index 0 = FAKE → CSV_FAKE_LABEL, model index 1 = TRUE → CSV_TRUE_LABEL
+            preds     = [CSV_FAKE_LABEL if p == 0 else CSV_TRUE_LABEL for p in raw_pred.tolist()]
             fake_prob = probs[:, 0].tolist()
 
         all_preds.extend(preds)
@@ -105,7 +112,7 @@ def predict_batch(texts: list[str], tokenizer, model, fake_idx: int) -> tuple[li
 
 def main() -> None:
     print(f"\n{'='*64}")
-    print("   SachAI  —  Model Evaluation on synthetic_400.csv")
+    print("   SachAI  —  Model Evaluation on test_samples.csv")
     print(f"{'='*64}")
 
     # ── Load the pre-generated 400-sample file ──────────────────────────────
@@ -113,15 +120,22 @@ def main() -> None:
         print(f"ERROR: {CSV_PATH} not found. Run the sampling step first.")
         sys.exit(1)
 
-    df     = pd.read_csv(CSV_PATH)
-    texts  = df["News Items"].astype(str).tolist()
-    y_true = df["label"].tolist()
+    df = pd.read_csv(CSV_PATH)
 
-    real_count = y_true.count(0)
-    fake_count = y_true.count(1)
+    # Stratified sample — 200 per class
+    fake_df = df[df["label"] == CSV_FAKE_LABEL].sample(n=200, random_state=42)
+    true_df = df[df["label"] == CSV_TRUE_LABEL].sample(n=200, random_state=42)
+    sample  = pd.concat([fake_df, true_df]).sample(frac=1, random_state=42).reset_index(drop=True)
 
-    print(f"\n  File     : {CSV_PATH.name}")
-    print(f"  Samples  : {len(df)}  (REAL={real_count}, FAKE={fake_count})")
+    texts  = sample["text"].astype(str).tolist()
+    # Keep labels in CSV space (0=TRUE, 1=FAKE) — predictions will be mapped to match
+    y_true = sample["label"].tolist()
+
+    real_count = y_true.count(CSV_TRUE_LABEL)
+    fake_count = y_true.count(CSV_FAKE_LABEL)
+
+    print(f"\n  File     : {CSV_PATH.name}  ({len(df):,} total rows)")
+    print(f"  Sampled  : 400 rows — 200 TRUE + 200 FAKE (stratified)")
     print(f"  Device   : {DEVICE}")
 
     # ── Load model ──────────────────────────────────────────────────────────
@@ -144,12 +158,12 @@ def main() -> None:
 
     # ── Compute metrics ─────────────────────────────────────────────────────
     acc       = accuracy_score(y_true, y_pred)
-    prec_fake = precision_score(y_true, y_pred, pos_label=1)
-    rec_fake  = recall_score(y_true, y_pred, pos_label=1)
-    f1_fake   = f1_score(y_true, y_pred, pos_label=1)
-    prec_real = precision_score(y_true, y_pred, pos_label=0)
-    rec_real  = recall_score(y_true, y_pred, pos_label=0)
-    f1_real   = f1_score(y_true, y_pred, pos_label=0)
+    prec_fake = precision_score(y_true, y_pred, pos_label=CSV_FAKE_LABEL)
+    rec_fake  = recall_score(y_true, y_pred, pos_label=CSV_FAKE_LABEL)
+    f1_fake   = f1_score(y_true, y_pred, pos_label=CSV_FAKE_LABEL)
+    prec_real = precision_score(y_true, y_pred, pos_label=CSV_TRUE_LABEL)
+    rec_real  = recall_score(y_true, y_pred, pos_label=CSV_TRUE_LABEL)
+    f1_real   = f1_score(y_true, y_pred, pos_label=CSV_TRUE_LABEL)
     f1_macro  = f1_score(y_true, y_pred, average="macro")
     prec_mac  = precision_score(y_true, y_pred, average="macro")
     rec_mac   = recall_score(y_true, y_pred, average="macro")
